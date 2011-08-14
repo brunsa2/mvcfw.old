@@ -2,7 +2,6 @@
 
 class RouteCompiler {
     public function RouteCompiler($route) {
-        echo 'Instantiated route compiler<br />';
         echo '<pre>' . print_r($route, true) . '</pre><br />';
         
         $tokens = $this->scanRoute($route->url);
@@ -10,6 +9,11 @@ class RouteCompiler {
         foreach($tokens as $token) {
             echo $token . '<br />';
         }
+        
+        echo '<br /><br />';
+        
+        $parser = new RouteParser($tokens);
+        $parser->parse();
     }
     
     private function scanRoute($route) {
@@ -84,6 +88,10 @@ class PlainTextToken extends Token {
     
     public function PlainTextToken($plainText) {
         $this->plainText = $plainText;
+    }
+    
+    public function getText() {
+        return $this->plainText;
     }
     
     public function __toString() {
