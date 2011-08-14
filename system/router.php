@@ -8,7 +8,13 @@ class Router {
     }
     
     public function init() {
-        
+        if(is_array($this->routeTable)) {
+            foreach($this->routeTable as $route) {
+                $compiledRoute = new RouteCompiler($route);
+            }
+        } else {
+            // TODO: Error handling
+        }
       
         return $this;
     }
