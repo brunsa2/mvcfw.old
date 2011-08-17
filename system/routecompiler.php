@@ -27,6 +27,12 @@ class RouteCompiler {
                 array_push($tokens, new OpeningParenthesisToken());
             } else if(self::isClosingParenthesis($character)) {
                 array_push($tokens, new ClosingParenthesisToken());
+            } else if(self::isPlusSign($character)) {
+                array_push($tokens, new PlusSignToken());
+            } else if(self::isAsterisk($character)) {
+                array_push($tokens, new AsteriskToken());
+            } else if(self::isSlash($character)) {
+                array_push($tokens, new SlashToken());
             } else if(self::isPlainTextCharacter($character)) {
                 $plainText = $character;
                 $continueScanningForPlainText = true;
@@ -64,7 +70,7 @@ class RouteCompiler {
     }
     
     private static function isPlainTextCharacter($character) {
-        return preg_match('/[A-Za-z0-9\/]/', $character) > 0;
+        return preg_match('/[A-Za-z0-9]/', $character) > 0;
     }
     
     private static function isOpeningParenthesis($character) {
@@ -77,6 +83,14 @@ class RouteCompiler {
     
     private static function isSlash($character) {
         return preg_match('/\//', $character) > 0;
+    }
+    
+    private static function isPlusSign($character) {
+        return preg_match('/\+/', $character) > 0;
+    }
+    
+    private static function isAsterisk($character) {
+        return preg_match('/\*/', $character) > 0;
     }
 }
 
@@ -108,6 +122,24 @@ class OpeningParenthesisToken extends Token {
 class ClosingParenthesisToken extends Token {
     public function __toString() {
         return 'T_CLOSING_PARENTHESIS (")")';
+    }
+}
+
+class PlusSignToken extends Token {
+    public function __toString() {
+        return 'T_PLUS_SIGN ("+")';
+    }
+}
+
+class AsteriskToken extends Token {
+    public function __toString() {
+        return 'T_ASTERISK ("*")';
+    }
+}
+
+class SlashToken extends Token {
+    public function __toString() {
+        return 'T_SLASH ("/")';
     }
 }
 
