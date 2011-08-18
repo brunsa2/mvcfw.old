@@ -95,6 +95,13 @@ class RouteCompiler {
 }
 
 abstract class Token {
+    public function is($tokenClass) {
+        return $this instanceof $tokenClass;
+    }
+    
+    public function isNot($tokenClass) {
+        return !($this instanceof $tokenClass);
+    }
 }
 
 class PlainTextToken extends Token {
@@ -109,37 +116,37 @@ class PlainTextToken extends Token {
     }
     
     public function __toString() {
-        return 'T_PLAIN_TEXT ("' . $this->plainText . '")';
+        return 'T_PLAIN_TEXT (' . $this->plainText . ')';
     }
 }
 
 class OpeningParenthesisToken extends Token {
     public function __toString() {
-        return 'T_OPENING_PARENTHESIS ("(")';
+        return 'T_OPENING_PARENTHESIS';
     }
 }
 
 class ClosingParenthesisToken extends Token {
     public function __toString() {
-        return 'T_CLOSING_PARENTHESIS (")")';
+        return 'T_CLOSING_PARENTHESIS';
     }
 }
 
 class PlusSignToken extends Token {
     public function __toString() {
-        return 'T_PLUS_SIGN ("+")';
+        return 'T_PLUS_SIGN';
     }
 }
 
 class AsteriskToken extends Token {
     public function __toString() {
-        return 'T_ASTERISK ("*")';
+        return 'T_ASTERISK';
     }
 }
 
 class SlashToken extends Token {
     public function __toString() {
-        return 'T_SLASH ("/")';
+        return 'T_SLASH';
     }
 }
 
