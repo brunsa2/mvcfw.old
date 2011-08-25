@@ -4,9 +4,11 @@ class RouteParser {
     private $tokens;
     
     private $xml = '';
+    private $route = '';
 
-    public function RouteParser($tokens) {
+    public function RouteParser($tokens, $route) {
         $this->tokens = $tokens;
+        $this->route = $route;
     }
     
     public function parse() {
@@ -14,7 +16,7 @@ class RouteParser {
         $this->parseUrlSpecification();
         $this->match('EndToken');
         $this->xml .= "</goal>\n";
-        file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . 'out.xml', $this->xml);
+        file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
     }
     
     private function parseUrlSpecification() {
@@ -42,7 +44,7 @@ class RouteParser {
             $this->parsePlaceholder();
         } else {
             echo 'Parse error parsing item<br />';
-            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . 'out.xml', $this->xml);
+            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             exit;
         }
         $this->xml .= "</item>\n";
@@ -66,7 +68,7 @@ class RouteParser {
             $this->match('PlainTextToken');
         } else {
             echo 'Parse error parsing placeholder contents<br />';
-            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . 'out.xml', $this->xml);
+            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             exit;
         }
         $this->xml .= "</placeholder_contents>\n";
@@ -94,7 +96,7 @@ class RouteParser {
             array_shift($this->tokens);
         } else {
             echo 'Parse error matching ' . $tokenClass . '<br />';
-            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . 'out.xml', $this->xml);
+            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             exit;
         }
     }
