@@ -43,8 +43,9 @@ class RouteParser {
         } else if($this->tokens[0]->is('OpeningParenthesisToken')) {
             $this->parsePlaceholder();
         } else {
-            echo 'Parse error parsing item<br />';
             file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
+            global $errorHandler;
+            $errorHandler->shutdown('Parse error parsing item');
             exit;
         }
         $this->xml .= "</item>\n";
@@ -67,8 +68,9 @@ class RouteParser {
         } else if($this->tokens[0]->is('PlainTextToken')) {
             $this->match('PlainTextToken');
         } else {
-            echo 'Parse error parsing placeholder contents<br />';
             file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
+            global $errorHandler;
+            $errorHandler->shutdown('Parse error parsing placeholder contents');
             exit;
         }
         $this->xml .= "</placeholder_contents>\n";
@@ -95,8 +97,9 @@ class RouteParser {
             $this->xml .= "</match>\n";
             array_shift($this->tokens);
         } else {
-            echo 'Parse error matching ' . $tokenClass . '<br />';
             file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
+            global $errorHandler;
+            $errorHandler->shutdown('Parse error matching ' . $tokenClass . ' token');
             exit;
         }
     }
