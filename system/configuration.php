@@ -3,7 +3,7 @@
 class Configuration {
 	private $configuration;
 	
-	public function Configuration() {
+	public function __construct() {
 		$this->configuration = new stdClass();
 		
 		if($configurationDirectoryHandle = opendir(ROOT_DIRECTORY . DS . CONFIG_DIRECTORY)) {

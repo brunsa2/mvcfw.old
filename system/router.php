@@ -3,7 +3,7 @@
 class Router {
     private $routeTable;
   
-    public function Router($routeTable) {
+    public function __construct($routeTable) {
         $this->routeTable = $routeTable;
     }
     
