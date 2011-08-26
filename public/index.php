@@ -16,6 +16,11 @@ define(SYSTEM_DIRECTORY, 'system');
 define(CONFIG_DIRECTORY, 'config');
 define(BOOTSTRAP, 'bootstrap.php');
 
-require_once(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . BOOTSTRAP);
+if(is_file(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . BOOTSTRAP)) {
+   require_once(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . BOOTSTRAP);
+} else {
+	echo 'System cannot find bootstrap system';
+	exit;
+}
 
 ?>

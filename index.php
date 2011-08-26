@@ -7,6 +7,10 @@ define(INDEX, 'index.php');
 
 define('REWRITE_ENGINE', false);
 
-require_once(ROOT_DIRECTORY . DS . PUBLIC_DIRECTORY . DS . INDEX);
+if(is_file(ROOT_DIRECTORY . DS . PUBLIC_DIRECTORY . DS . INDEX)) {
+	require_once(ROOT_DIRECTORY . DS . PUBLIC_DIRECTORY . DS . INDEX);
+} else {
+	echo 'System cannot find public file root';
+}
 
 ?>
