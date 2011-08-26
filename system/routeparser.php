@@ -6,7 +6,7 @@ class RouteParser {
     private $xml = '';
     private $route = '';
 
-    public function RouteParser($tokens, $route) {
+    public function __construct($tokens, $route) {
         $this->tokens = $tokens;
         $this->route = $route;
     }

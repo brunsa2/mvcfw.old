@@ -1,7 +1,7 @@
 <?php
 
 class RouteCompiler {
-    public function RouteCompiler($route) {
+    public function __construct($route) {
         echo '<pre>' . print_r($route, true) . '</pre><br />';
         
         $scanner = new RouteScanner();

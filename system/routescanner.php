@@ -34,6 +34,9 @@ class RouteScanner {
                 }
                 
                 array_push($tokens, new PlainTextToken($plainText));
+            } else {
+                global $errorHandler;
+                $errorHandler->shutdown('Scan error');
             }
         }
         
