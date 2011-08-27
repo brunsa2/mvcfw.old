@@ -8,13 +8,20 @@ class Router {
     }
     
     public function init() {
-        // TODO: Separate out the router from the route compiler
         if(is_array($this->routeTable)) {
-            foreach($this->routeTable as $route) {
-                $compiledRoute = new RouteCompiler($route);
+            foreach($this->routeTable as $routeKey => $route) {
+                $scanner = new RouteScanner();
+                $tokens = $scanner->scanRoute($route->url);
+                
+                $parser = new RouteParser($tokens, $route->url);
+                $compiledRoute = $parser->parse();
+                $this->routeTable[$routeKey] = $compiledRoute;
             }
+            
+            echo '<pre>' . print_r($this->routeTable, true) . '</pre>';
         } else {
-            // TODO: Error handling
+            global $errorHandler;
+            $errorHandler->shutdown('Route table is not an array of routes');
         }
       
         return $this;

@@ -17,6 +17,7 @@ class RouteParser {
         $this->match('EndToken');
         $this->xml .= "</goal>\n";
         file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
+        return $urlSpecification;
     }
     
     private function parseUrlSpecification() {
@@ -26,7 +27,6 @@ class RouteParser {
         $urlSpecification['regexes'] = $list['regexes'];
         array_push($urlSpecification['regexes'], end($list['regexes']) . '\/');
         $urlSpecification['placeholders'] = $list['placeholders'];
-        echo '<pre>' . print_r($urlSpecification, true) . '</pre><br /><br /><br />';
         $this->xml .= "</url_specification>\n";
         return $urlSpecification;
     }
