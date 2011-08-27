@@ -24,8 +24,12 @@ class RouteParser {
         $this->xml .= "<url_specification>\n";
         $list = $this->parseList(array());
         $urlSpecification = array();
-        $urlSpecification['regexes'] = $list['regexes'];
-        array_push($urlSpecification['regexes'], end($list['regexes']) . '\/');
+        $urlSpecification['regexes'] = array();
+        array_push($urlSpecification['regexes'], '^$');
+        foreach($list['regexes'] as $regex) {
+            array_push($urlSpecification['regexes'], '^' . $regex . '$');
+        }
+        array_push($urlSpecification['regexes'], '^' . end($list['regexes']) . '\/$');
         $urlSpecification['placeholders'] = $list['placeholders'];
         $this->xml .= "</url_specification>\n";
         return $urlSpecification;
