@@ -4,6 +4,8 @@ class RouteScanner {
     public function scanRoute($route) {
         $tokens = array();
         
+        array_push($tokens, new BeginningToken());
+        
         while(self::hasCharacter($route)) {
             $character = self::lookAtTopCharacter($route);
             $route = self::removeTopCharacter($route);
@@ -135,6 +137,12 @@ class AsteriskToken extends Token {
 class SlashToken extends Token {
     public function __toString() {
         return 'T_SLASH';
+    }
+}
+
+class BeginningToken extends Token {
+    public function __toString() {
+        return 'T_BEGINNING_OF_STREAM';
     }
 }
 

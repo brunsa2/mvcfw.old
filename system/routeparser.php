@@ -25,7 +25,6 @@ class RouteParser {
         $list = $this->parseList(array());
         $urlSpecification = array();
         $urlSpecification['regexes'] = array();
-        array_push($urlSpecification['regexes'], '^$');
         foreach($list['regexes'] as $regex) {
             array_push($urlSpecification['regexes'], '^' . $regex . '$');
         }
@@ -68,7 +67,11 @@ class RouteParser {
     
     private function parseItem($item) {
         $this->xml .= "<item>\n";
-        if($this->tokens[0]->is('PlainTextToken')) {
+        if($this->tokens[0]->is('BeginningToken')) {
+            $this->match('BeginningToken');
+            $item['value'] = '';
+            $item['hitOptional'] = $item['hitOptional'] ? true : false;
+        } else if($this->tokens[0]->is('PlainTextToken')) {
             $token = $this->match('PlainTextToken');
             $item['value'] = $token->getText();
             $item['hitOptional'] = $item['hitOptional'] ? true : false;
