@@ -21,58 +21,65 @@ class RouteParser {
     
     private function parseUrlSpecification() {
         $this->xml .= "<url_specification>\n";
-        $list = $this->parseList($level + 1);
+        $list = $this->parseList(array());
         $urlSpecification = array();
         $urlSpecification['regexes'] = $list['regexes'];
         array_push($urlSpecification['regexes'], end($list['regexes']) . '\/');
-        $urlSpecification['symbols'] = $list['symbols'];
+        $urlSpecification['placeholders'] = $list['placeholders'];
         echo '<pre>' . print_r($urlSpecification, true) . '</pre><br /><br /><br />';
         $this->xml .= "</url_specification>\n";
         return $urlSpecification;
     }
     
-    private function parseList() {
+    private function parseList($list) {
         $this->xml .= "<list>\n";
-        $list = array();
         $list['regexes'] = array();
         if($this->tokens[0]->isNot('EndToken')) {
-            $item = $item = $this->parseItem();
-            $list1 = $this->parseList();
+            $item = array();
+            $item['hitOptional'] = $list['hitOptional'];
+            $item = $this->parseItem($item);
+            $nextList = array();
+            $nextList['hitOptional'] = $item['hitOptional'] || $list['hitOptional'];
+            $nextList = $this->parseList($nextList);
             $list['regexes'] = array();
             array_push($list['regexes'], $item['value']);
-            foreach($list1['regexes'] as $regex) {
+            foreach($nextList['regexes'] as $regex) {
                 array_push($list['regexes'], $item['value'] . $regex);
             }
-            $list['symbols'] = array();
-            if(array_key_exists('symbol', $item)) {
-                array_push($list['symbols'], $item['symbol']);
+            $list['placeholders'] = array();
+            if(array_key_exists('placeholder', $item)) {
+                array_push($list['placeholders'], $item['placeholder']);
             }
-            foreach($list1['symbols'] as $symbol) {
-                array_push($list['symbols'], $symbol);
+            foreach($nextList['placeholders'] as $placeholder) {
+                array_push($list['placeholders'], $placeholder);
             }
-            echo '<pre>' . print_r($list, true) . '</pre><br /><br /><br />';
+            $list['hitOptional'] = $nextList['hitOptional'];
         } else {
             $list['regexes'] = array();
-            $list['symbols'] = array();
+            $list['placeholders'] = array();
+            $list['hitOptional'] = false;
         }
         $this->xml .= "</list>\n";
         return $list;
     }
     
-    private function parseItem() {
+    private function parseItem($item) {
         $this->xml .= "<item>\n";
-        $item = array();
         if($this->tokens[0]->is('PlainTextToken')) {
             $token = $this->match('PlainTextToken');
             $item['value'] = $token->getText();
+            $item['hitOptional'] = $item['hitOptional'] ? true : false;
         } else if($this->tokens[0]->is('SlashToken')) {
             $this->match('SlashToken');
             $item['value'] = '\/';
-            return $item;
+            $item['hitOptional'] = $item['hitOptional'] ? true : false;
         } else if($this->tokens[0]->is('OpeningParenthesisToken')) {
-            $placeholder = $this->parsePlaceholder();
+            $placeholder = array();
+            $placeholder['hitOptional'] = $item['hitOptional'];
+            $placeholder = $this->parsePlaceholder($placeholder);
             $item['value'] = $placeholder['value'];
-            $item['symbol'] = $placeholder['symbol'];
+            $item['placeholder'] = $placeholder['placeholder'];
+            $item['hitOptional'] = $item['hitOptional'] ? true : $placeholder['hitOptional'];
         } else {
             file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             global $errorHandler;
@@ -83,33 +90,41 @@ class RouteParser {
         return $item;
     }
     
-    private function parsePlaceholder() {
+    private function parsePlaceholder($placeholder) {
         $this->xml .= "<placeholder>\n";
-        $placeholder = array();
         $this->match('OpeningParenthesisToken');
-        $placeholderContents = $this->parsePlaceholderContents();
+        $placeholderContents = array();
+        $placeholderContents['hitOptional'] = $placeholder['hitOptional'];
+        $placeholderContents = $this->parsePlaceholderContents($placeholderContents);
         $placeholder['value'] = $placeholderContents['value'];
-        $placeholder['symbol'] = $placeholderContents['symbol'];
+        $placeholder['placeholder'] = $placeholderContents['placeholder'];
+        $placeholder['hitOptional'] = $placeholderContents['hitOptional'];
         $this->match('ClosingParenthesisToken');
         $this->xml .= "</placeholder>\n";
         return $placeholder;
     }
     
-    private function parsePlaceholderContents() {
+    private function parsePlaceholderContents($placeholderContents) {
         $this->xml .= "<placeholder_contents>\n";
-        $placeholderContents = array();
         if($this->tokens[0]->is('AsteriskToken')) {
             $absorbingPlaceholder = $this->parseAbsorbingPlaceholder();
             $placeholderContents['value'] = '([A-Za-z0-9\/]+)';
-            $placeholderContents['symbol'] = $absorbingPlaceholder['symbol'];
+            $placeholderContents['placeholder'] = $absorbingPlaceholder['placeholder'];
+            $placeholderContents['hitOptional'] = true;
         } else if($this->tokens[0]->is('PlusSignToken')) {
             $optionalPlaceholder = $this->parseOptionalPlaceholder();
             $placeholderContents['value'] = '([A-Za-z0-9]+)';
-            $placeholderContents['symbol'] = $optionalPlaceholder['symbol'];
+            $placeholderContents['placeholder'] = $optionalPlaceholder['placeholder'];
+            $placeholderContents['hitOptional'] = true;
         } else if($this->tokens[0]->is('PlainTextToken')) {
+            if($placeholderContents['hitOptional']) {
+                global $errorHandler;
+                $errorHandler->shutdown('Semantic error: Cannot have required matches after optional ones');
+            }
             $token = $this->match('PlainTextToken');
             $placeholderContents['value'] = '([A-Za-z0-9]+)';
-            $placeholderContents['symbol'] = array($token->getText(), 'required');
+            $placeholderContents['placeholder'] = array($token->getText(), 'required');
+            $placeholderContents['hitOptional'] = false;
         } else {
             file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             global $errorHandler;
@@ -125,7 +140,7 @@ class RouteParser {
         $this->match('AsteriskToken');
         $token = $this->match('PlainTextToken');
         $absorbingPlaceholder = array();
-        $absorbingPlaceholder['symbol'] = array($token->getText(), 'optional');
+        $absorbingPlaceholder['placeholder'] = array($token->getText(), 'optional');
         $this->xml .= "</absorbing_placeholder>\n";
         return $absorbingPlaceholder;
     }
@@ -135,7 +150,7 @@ class RouteParser {
         $this->match('PlusSignToken');
         $token = $this->match('PlainTextToken');
         $optionalPlaceholder = array();
-        $optionalPlaceholder['symbol'] = array($token->getText(), 'optional');
+        $optionalPlaceholder['placeholder'] = array($token->getText(), 'optional');
         $this->xml .= "</optional_placeholder>\n";
         return $optionalPlaceholder;
     }
