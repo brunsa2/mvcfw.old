@@ -53,7 +53,6 @@ class RouteParser {
             foreach($nextList['placeholders'] as $placeholder) {
                 array_push($list['placeholders'], $placeholder);
             }
-            $list['hitOptional'] = $nextList['hitOptional'];
         } else {
             $list['regexes'] = array();
             $list['placeholders'] = array();
