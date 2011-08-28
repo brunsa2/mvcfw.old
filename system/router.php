@@ -37,7 +37,7 @@ class Router {
                 foreach($defaults as $name => $default) {
                     $placeholder = array();
                     $placeholder[0] = $name;
-                    $placeholder[1] = 'required';
+                    $placeholder[1] = 'optional';
                     $placeholder[2] = $default;
                     array_push($placeholders, $placeholder);
                 }

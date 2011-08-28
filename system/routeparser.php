@@ -28,7 +28,6 @@ class RouteParser {
         foreach($list['regexes'] as $regex) {
             array_push($urlSpecification['regexes'], '^' . $regex . '$');
         }
-        array_push($urlSpecification['regexes'], '^' . end($list['regexes']) . '\/$');
         $urlSpecification['placeholders'] = $list['placeholders'];
         $this->xml .= "</url_specification>\n";
         return $urlSpecification;
@@ -42,7 +41,7 @@ class RouteParser {
             $item['hitOptional'] = $list['hitOptional'];
             $item = $this->parseItem($item);
             $nextList = array();
-            $nextList['hitOptional'] = $item['hitOptional'] || $list['hitOptional'];
+            $nextList['hitOptional'] = $list['hitOptional'] || $item['hitOptional'];
             $nextList = $this->parseList($nextList);
             $list['regexes'] = array();
             array_push($list['regexes'], $item['value']);
@@ -59,7 +58,6 @@ class RouteParser {
         } else {
             $list['regexes'] = array();
             $list['placeholders'] = array();
-            $list['hitOptional'] = false;
         }
         $this->xml .= "</list>\n";
         return $list;
