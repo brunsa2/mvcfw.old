@@ -38,7 +38,7 @@ class RouteScanner {
                 array_push($tokens, new PlainTextToken($plainText));
             } else {
                 global $errorHandler;
-                $errorHandler->shutdown('Scan error');
+                $errorHandler->shutdown('Scan error at character ' . $character);
             }
         }
         
@@ -60,7 +60,7 @@ class RouteScanner {
     }
     
     private static function isPlainTextCharacter($character) {
-        return preg_match('/[A-Za-z0-9]/', $character) > 0;
+        return preg_match('/[A-Za-z0-9;:@&=\-_!\',$.\*\+]/', $character) > 0;
     }
     
     private static function isOpeningParenthesis($character) {
@@ -102,7 +102,12 @@ class PlainTextToken extends Token {
     }
     
     public function getText() {
-        return $this->plainText;
+        $escapedText = $this->plainText;
+        $escapedText = str_replace('+', '\+', $escapedText);
+        $escapedText = str_replace('*', '\*', $escapedText);
+        $escapedText = str_replace('$', '\$', $escapedText);
+        $escapedText = str_replace('.', '\.', $escapedText);
+        return $escapedText;
     }
     
     public function __toString() {
