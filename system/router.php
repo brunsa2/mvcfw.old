@@ -25,15 +25,13 @@ class Router {
                             $placeholder['defaultValue'] = $default;
                             $placeholder['regex'] = $regexes[$name] != '' ? $regexes[$name] : '//';
                             unset($defaults[$name]);
-                            
-                            if($route->controller && $route->controller == $name) {
-                                $placeholder['routing'] = 'controller';
-                            } else if($route->action && $route->action == $name) {
-                                $placeholder['routing'] = 'action';
-                            }
                         }
-                        
                     }
+                    if($route->controller && $route->controller == $placeholder['name']) {
+                        $placeholder['routing'] = 'controller';
+                    } else if($route->action && $route->action == $placeholder['name']) {
+                        $placeholder['routing'] = 'action';
+                    } 
                     array_push($placeholders, $placeholder);
                 }
                 foreach($defaults as $name => $default) {
