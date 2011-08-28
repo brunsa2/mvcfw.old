@@ -10,10 +10,10 @@ class RouteScanner {
             $character = self::lookAtTopCharacter($route);
             $route = self::removeTopCharacter($route);
             
-            if(self::isOpeningParenthesis($character)) {
-                array_push($tokens, new OpeningParenthesisToken());
-            } else if(self::isClosingParenthesis($character)) {
-                array_push($tokens, new ClosingParenthesisToken());
+            if(self::isOpeningBrace($character)) {
+                array_push($tokens, new OpeningBraceToken());
+            } else if(self::isClosingBrace($character)) {
+                array_push($tokens, new ClosingBraceToken());
             } else if(self::isPlusSign($character)) {
                 array_push($tokens, new PlusSignToken());
             } else if(self::isAsterisk($character)) {
@@ -60,15 +60,15 @@ class RouteScanner {
     }
     
     private static function isPlainTextCharacter($character) {
-        return preg_match('/[A-Za-z0-9;:@&=\-_!\',$.\*\+]/', $character) > 0;
+        return preg_match('/[A-Za-z0-9;:@&=\-_!\',$.\*\+()]/', $character) > 0;
     }
     
-    private static function isOpeningParenthesis($character) {
-        return preg_match('/\(/', $character) > 0;
+    private static function isOpeningBrace($character) {
+        return preg_match('/{/', $character) > 0;
     }
     
-    private static function isClosingParenthesis($character) {
-        return preg_match('/\)/', $character) > 0;
+    private static function isClosingBrace($character) {
+        return preg_match('/}/', $character) > 0;
     }
     
     private static function isSlash($character) {
@@ -107,6 +107,8 @@ class PlainTextToken extends Token {
         $escapedText = str_replace('*', '\*', $escapedText);
         $escapedText = str_replace('$', '\$', $escapedText);
         $escapedText = str_replace('.', '\.', $escapedText);
+        $escapedText = str_replace('(', '\(', $escapedText);
+        $escapedText = str_replace(')', '\)', $escapedText);
         return $escapedText;
     }
     
@@ -115,15 +117,15 @@ class PlainTextToken extends Token {
     }
 }
 
-class OpeningParenthesisToken extends Token {
+class OpeningBraceToken extends Token {
     public function __toString() {
-        return 'T_OPENING_PARENTHESIS';
+        return 'T_OPENING_BRACE';
     }
 }
 
-class ClosingParenthesisToken extends Token {
+class ClosingBraceToken extends Token {
     public function __toString() {
-        return 'T_CLOSING_PARENTHESIS';
+        return 'T_CLOSING_BRACE';
     }
 }
 

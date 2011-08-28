@@ -77,7 +77,7 @@ class RouteParser {
             $this->match('SlashToken');
             $item['value'] = '\/';
             $item['hitOptional'] = $item['hitOptional'] ? true : false;
-        } else if($this->tokens[0]->is('OpeningParenthesisToken')) {
+        } else if($this->tokens[0]->is('OpeningBraceToken')) {
             $placeholder = array();
             $placeholder['hitOptional'] = $item['hitOptional'];
             $placeholder = $this->parsePlaceholder($placeholder);
@@ -96,14 +96,14 @@ class RouteParser {
     
     private function parsePlaceholder($placeholder) {
         $this->xml .= "<placeholder>\n";
-        $this->match('OpeningParenthesisToken');
+        $this->match('OpeningBraceToken');
         $placeholderContents = array();
         $placeholderContents['hitOptional'] = $placeholder['hitOptional'];
         $placeholderContents = $this->parsePlaceholderContents($placeholderContents);
         $placeholder['value'] = $placeholderContents['value'];
         $placeholder['placeholder'] = $placeholderContents['placeholder'];
         $placeholder['hitOptional'] = $placeholderContents['hitOptional'];
-        $this->match('ClosingParenthesisToken');
+        $this->match('ClosingBraceToken');
         $this->xml .= "</placeholder>\n";
         return $placeholder;
     }
