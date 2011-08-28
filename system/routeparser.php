@@ -112,12 +112,12 @@ class RouteParser {
         $this->xml .= "<placeholder_contents>\n";
         if($this->tokens[0]->is('AsteriskToken')) {
             $absorbingPlaceholder = $this->parseAbsorbingPlaceholder();
-            $placeholderContents['value'] = '([A-Za-z0-9;:@&=\-_!\',$.\*\+()\/]+)';
+            $placeholderContents['value'] = '(.+)';
             $placeholderContents['placeholder'] = $absorbingPlaceholder['placeholder'];
             $placeholderContents['hitOptional'] = true;
         } else if($this->tokens[0]->is('PlusSignToken')) {
             $optionalPlaceholder = $this->parseOptionalPlaceholder();
-            $placeholderContents['value'] = '([A-Za-z0-9;:@&=\-_!\',$.\*\+()]+)';
+            $placeholderContents['value'] = '([^\/]+)';
             $placeholderContents['placeholder'] = $optionalPlaceholder['placeholder'];
             $placeholderContents['hitOptional'] = true;
         } else if($this->tokens[0]->is('PlainTextToken')) {
@@ -126,7 +126,7 @@ class RouteParser {
                 $errorHandler->shutdown('Semantic error: Cannot have required matches after optional ones');
             }
             $token = $this->match('PlainTextToken');
-            $placeholderContents['value'] = '([A-Za-z0-9;:@&=\-_!\',$.\*\+()]+)';
+            $placeholderContents['value'] = '([^\/]+)';
             $placeholderContents['placeholder'] = array();
             $placeholderContents['placeholder']['name'] = $token->getText();
             $placeholderContents['placeholder']['type'] = 'required';

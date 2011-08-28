@@ -60,7 +60,7 @@ class RouteScanner {
     }
     
     private static function isPlainTextCharacter($character) {
-        return preg_match('/[A-Za-z0-9;:@&=\-_!\',$.\*\+()]/', $character) > 0;
+        return preg_match('/[^{}\/]/', $character) > 0;
     }
     
     private static function isOpeningBrace($character) {
