@@ -112,12 +112,12 @@ class RouteParser {
         $this->xml .= "<placeholder_contents>\n";
         if($this->tokens[0]->is('AsteriskToken')) {
             $absorbingPlaceholder = $this->parseAbsorbingPlaceholder();
-            $placeholderContents['value'] = '([A-Za-z0-9\/]+)';
+            $placeholderContents['value'] = '([A-Za-z0-9;:@&=\-_!\',$.\*\+()\/]+)';
             $placeholderContents['placeholder'] = $absorbingPlaceholder['placeholder'];
             $placeholderContents['hitOptional'] = true;
         } else if($this->tokens[0]->is('PlusSignToken')) {
             $optionalPlaceholder = $this->parseOptionalPlaceholder();
-            $placeholderContents['value'] = '([A-Za-z0-9]+)';
+            $placeholderContents['value'] = '([A-Za-z0-9;:@&=\-_!\',$.\*\+()]+)';
             $placeholderContents['placeholder'] = $optionalPlaceholder['placeholder'];
             $placeholderContents['hitOptional'] = true;
         } else if($this->tokens[0]->is('PlainTextToken')) {
@@ -126,8 +126,10 @@ class RouteParser {
                 $errorHandler->shutdown('Semantic error: Cannot have required matches after optional ones');
             }
             $token = $this->match('PlainTextToken');
-            $placeholderContents['value'] = '([A-Za-z0-9]+)';
-            $placeholderContents['placeholder'] = array($token->getText(), 'required');
+            $placeholderContents['value'] = '([A-Za-z0-9;:@&=\-_!\',$.\*\+()]+)';
+            $placeholderContents['placeholder'] = array();
+            $placeholderContents['placeholder']['name'] = $token->getText();
+            $placeholderContents['placeholder']['type'] = 'required';
             $placeholderContents['hitOptional'] = false;
         } else {
             file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
@@ -144,7 +146,9 @@ class RouteParser {
         $this->match('AsteriskToken');
         $token = $this->match('PlainTextToken');
         $absorbingPlaceholder = array();
-        $absorbingPlaceholder['placeholder'] = array($token->getText(), 'optional');
+        $absorbingPlaceholder['placeholder'] = array();
+        $absorbingPlaceholder['placeholder']['name'] = $token->getText();
+        $absorbingPlaceholder['placeholder']['type'] = 'optional';
         $this->xml .= "</absorbing_placeholder>\n";
         return $absorbingPlaceholder;
     }
@@ -154,7 +158,9 @@ class RouteParser {
         $this->match('PlusSignToken');
         $token = $this->match('PlainTextToken');
         $optionalPlaceholder = array();
-        $optionalPlaceholder['placeholder'] = array($token->getText(), 'optional');
+        $optionalPlaceholder['placeholder'] = array();
+        $optionalPlaceholder['placeholder']['name'] = $token->getText();
+        $optionalPlaceholder['placeholder']['type'] = 'optional';
         $this->xml .= "</optional_placeholder>\n";
         return $optionalPlaceholder;
     }

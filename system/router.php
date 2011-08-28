@@ -20,14 +20,14 @@ class Router {
                 $defaults = (array) $route->defaults;
                 foreach($compiledRoute['placeholders'] as $placeholder) {
                     foreach($defaults as $name => $default) {
-                        if($placeholder[0] == $name) {
-                            $placeholder[2] = $default;
+                        if($placeholder['name'] == $name) {
+                            $placeholder['defaultValue'] = $default;
                             unset($defaults[$name]);
                             
                             if($route->controller && $route->controller == $name) {
-                                $placeholder[3] = 'controller';
+                                $placeholder['routing'] = 'controller';
                             } else if($route->action && $route->action == $name) {
-                                $placeholder[3] = 'action';
+                                $placeholder['routing'] = 'action';
                             }
                         }
                         
@@ -36,17 +36,17 @@ class Router {
                 }
                 foreach($defaults as $name => $default) {
                     $placeholder = array();
-                    $placeholder[0] = $name;
-                    $placeholder[1] = 'optional';
-                    $placeholder[2] = $default;
+                    $placeholder['name'] = $name;
+                    $placeholder['type'] = 'optional';
+                    $placeholder['defaultValue'] = $default;
                     array_push($placeholders, $placeholder);
                 }
                 $foundController = false;
                 $foundAction = false;
                 foreach($placeholders as $placeholder) {
-                    if($placeholder[3] && $placeholder[3] == 'controller') {
+                    if($placeholder['routing'] && $placeholder['routing'] == 'controller') {
                         $foundController = true;
-                    } else if($placeholder[3] && $placeholder[3] == 'action') {
+                    } else if($placeholder['routing'] && $placeholder['routing'] == 'action') {
                         $foundAction = true;
                     }
                 }
@@ -54,8 +54,8 @@ class Router {
                 if(!$foundController) {
                     $adjustedPlaceholders = array();
                     foreach($placeholders as $placeholder) {
-                        if(!$setController && !$placeholder[3]) {
-                            $placeholder[3] = 'controller';
+                        if(!$setController && !$placeholder['routing']) {
+                            $placeholder['routing'] = 'controller';
                             $setController = true;
                         }
                         array_push($adjustedPlaceholders, $placeholder);
@@ -66,8 +66,8 @@ class Router {
                 if(!$foundAction) {
                     $adjustedPlaceholders = array();
                     foreach($placeholders as $placeholder) {
-                        if(!$setAction && !$placeholder[3]) {
-                            $placeholder[3] = 'action';
+                        if(!$setAction && !$placeholder['routing']) {
+                            $placeholder['routing'] = 'action';
                             $setAction = true;
                         }
                         array_push($adjustedPlaceholders, $placeholder);
