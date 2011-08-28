@@ -13,7 +13,7 @@ class Router {
                 $scanner = new RouteScanner();
                 $tokens = $scanner->scanRoute($route->url);
                 
-                $parser = new RouteParser($tokens, $route->url);
+                $parser = new RouteParser($tokens);
                 $compiledRoute = $parser->parse();
                 
                 $placeholders = array();

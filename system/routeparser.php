@@ -2,26 +2,18 @@
 
 class RouteParser {
     private $tokens;
-    
-    private $xml = '';
-    private $route = '';
 
-    public function __construct($tokens, $route) {
+    public function __construct($tokens) {
         $this->tokens = $tokens;
-        $this->route = $route;
     }
     
     public function parse() {
-        $this->xml .= "<goal>\n";
         $urlSpecification = $this->parseUrlSpecification();
         $this->match('EndToken');
-        $this->xml .= "</goal>\n";
-        file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
         return $urlSpecification;
     }
     
     private function parseUrlSpecification() {
-        $this->xml .= "<url_specification>\n";
         $list = $this->parseList(array());
         $urlSpecification = array();
         $urlSpecification['regexes'] = array();
@@ -29,12 +21,10 @@ class RouteParser {
             array_push($urlSpecification['regexes'], '^' . $regex . '$');
         }
         $urlSpecification['placeholders'] = $list['placeholders'];
-        $this->xml .= "</url_specification>\n";
         return $urlSpecification;
     }
     
     private function parseList($list) {
-        $this->xml .= "<list>\n";
         $list['regexes'] = array();
         if($this->tokens[0]->isNot('EndToken')) {
             $item = array();
@@ -59,12 +49,10 @@ class RouteParser {
             $list['regexes'] = array();
             $list['placeholders'] = array();
         }
-        $this->xml .= "</list>\n";
         return $list;
     }
     
     private function parseItem($item) {
-        $this->xml .= "<item>\n";
         if($this->tokens[0]->is('BeginningToken')) {
             $this->match('BeginningToken');
             $item['value'] = '';
@@ -85,17 +73,14 @@ class RouteParser {
             $item['placeholder'] = $placeholder['placeholder'];
             $item['hitOptional'] = $item['hitOptional'] ? true : $placeholder['hitOptional'];
         } else {
-            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             global $errorHandler;
             $errorHandler->shutdown('Parse error parsing item');
             exit;
         }
-        $this->xml .= "</item>\n";
         return $item;
     }
     
     private function parsePlaceholder($placeholder) {
-        $this->xml .= "<placeholder>\n";
         $this->match('OpeningBraceToken');
         $placeholderContents = array();
         $placeholderContents['hitOptional'] = $placeholder['hitOptional'];
@@ -104,12 +89,10 @@ class RouteParser {
         $placeholder['placeholder'] = $placeholderContents['placeholder'];
         $placeholder['hitOptional'] = $placeholderContents['hitOptional'];
         $this->match('ClosingBraceToken');
-        $this->xml .= "</placeholder>\n";
         return $placeholder;
     }
     
     private function parsePlaceholderContents($placeholderContents) {
-        $this->xml .= "<placeholder_contents>\n";
         if($this->tokens[0]->is('AsteriskToken')) {
             $absorbingPlaceholder = $this->parseAbsorbingPlaceholder();
             $placeholderContents['value'] = '(.+)';
@@ -132,47 +115,37 @@ class RouteParser {
             $placeholderContents['placeholder']['type'] = 'required';
             $placeholderContents['hitOptional'] = false;
         } else {
-            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             global $errorHandler;
             $errorHandler->shutdown('Parse error parsing placeholder contents');
             exit;
         }
-        $this->xml .= "</placeholder_contents>\n";
         return $placeholderContents;
     }
     
     private function parseAbsorbingPlaceholder() {
-        $this->xml .= "<absorbing_placeholder>\n";
         $this->match('AsteriskToken');
         $token = $this->match('PlainTextToken');
         $absorbingPlaceholder = array();
         $absorbingPlaceholder['placeholder'] = array();
         $absorbingPlaceholder['placeholder']['name'] = $token->getText();
         $absorbingPlaceholder['placeholder']['type'] = 'optional';
-        $this->xml .= "</absorbing_placeholder>\n";
         return $absorbingPlaceholder;
     }
     
     private function parseOptionalPlaceholder() {
-        $this->xml .= "<optional_placeholder>\n";
         $this->match('PlusSignToken');
         $token = $this->match('PlainTextToken');
         $optionalPlaceholder = array();
         $optionalPlaceholder['placeholder'] = array();
         $optionalPlaceholder['placeholder']['name'] = $token->getText();
         $optionalPlaceholder['placeholder']['type'] = 'optional';
-        $this->xml .= "</optional_placeholder>\n";
         return $optionalPlaceholder;
     }
     
     public function match($tokenClass) {
-        $this->xml .= "<match token_type=\"" . $tokenClass . "\">\n";
         if($this->tokens[0]->is($tokenClass)) {
-            $this->xml .= "<matched token=\"" . $this->tokens[0] . "\" />\n";
-            $this->xml .= "</match>\n";
             return array_shift($this->tokens);
         } else {
-            file_put_contents(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . sha1($this->route) . '.xml', $this->xml);
             global $errorHandler;
             $errorHandler->shutdown('Parse error matching ' . $tokenClass . ' token');
             exit;
