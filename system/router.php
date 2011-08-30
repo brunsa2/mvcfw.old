@@ -79,8 +79,6 @@ class Router {
                 
                 $this->routeTable[$routeKey] = $compiledRoute;
             }
-            
-            echo '<pre>' . print_r($this->routeTable, true) . '</pre>';
         } else {
             global $errorHandler;
             $errorHandler->shutdown('Route table is not an array of routes');
