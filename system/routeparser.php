@@ -18,7 +18,7 @@ class RouteParser {
         $urlSpecification = array();
         $urlSpecification['regexes'] = array();
         foreach($list['regexes'] as $regex) {
-            array_push($urlSpecification['regexes'], '^' . $regex . '$');
+            array_push($urlSpecification['regexes'], '/^' . $regex . '$/');
         }
         $urlSpecification['placeholders'] = $list['placeholders'];
         return $urlSpecification;
