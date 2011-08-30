@@ -34,10 +34,10 @@ class RouteParser {
             $nextList['hitOptional'] = $list['hitOptional'] || $item['hitOptional'];
             $nextList = $this->parseList($nextList);
             $list['regexes'] = array();
-            array_push($list['regexes'], $item['value']);
             foreach($nextList['regexes'] as $regex) {
                 array_push($list['regexes'], $item['value'] . $regex);
             }
+            array_push($list['regexes'], $item['value']);
             $list['placeholders'] = array();
             if(array_key_exists('placeholder', $item)) {
                 array_push($list['placeholders'], $item['placeholder']);
