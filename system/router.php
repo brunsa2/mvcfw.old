@@ -99,6 +99,8 @@ class Router {
                 }
             }
         }
+        
+        return false;
     }
     
     private function attemptRouteMatch($placeholders, $matches) {
@@ -111,7 +113,7 @@ class Router {
             }
         }
         foreach($placeholders as $placeholder) {
-            if(!$placeholder['value']) {
+            if(!$placeholder['value'] && $placeholder['type'] == 'optional') {
                 $placeholder['value'] = $placeholder['defaultValue'];
             }
             
