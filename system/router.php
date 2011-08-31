@@ -23,7 +23,9 @@ class Router {
                     foreach($defaults as $name => $default) {
                         if($placeholder['name'] == $name) {
                             $placeholder['defaultValue'] = $default;
-                            $placeholder['regex'] = $regexes[$name] != '' ? $regexes[$name] : '//';
+                            if($regexes[$name]) {
+                                $placeholder['regex'] = $regexes[$name];
+                            }
                             unset($defaults[$name]);
                         }
                     }
@@ -39,7 +41,6 @@ class Router {
                     $placeholder['name'] = $name;
                     $placeholder['type'] = 'optional';
                     $placeholder['defaultValue'] = $default;
-                    $placeholder['regex'] = $regexes[$name] != '' ? $regexes[$name] : '//';
                     array_push($placeholders, $placeholder);
                 }
                 $foundController = false;
