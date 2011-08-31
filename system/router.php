@@ -88,8 +88,64 @@ class Router {
         return $this;
     }
     
-    public function findRoute() {
+    public function findRoute($routeUrl) {
+        foreach($this->routeTable as $route) {
+            $route['regexes'] = array_reverse($route['regexes']);
+            foreach($route['regexes'] as $regex) {
+                if(preg_match($regex, $routeUrl, $matches)) {
+                    if($match = $this->attemptRouteMatch($route['placeholders'], $matches)) {
+                        return $match;
+                    }
+                }
+            }
+        }
         
+        return false;
+    }
+    
+    private function attemptRouteMatch($placeholders, $matches) {
+        array_shift($matches);
+        $routeMatch = array();
+        $matchValues = array();
+        foreach($matches as $position => $match) {
+            if($placeholders[$position]) {
+                $placeholders[$position]['value'] = $match;
+            }
+        }
+        foreach($placeholders as $placeholder) {
+            if(!$placeholder['value'] && $placeholder['type'] == 'optional') {
+                $placeholder['value'] = $placeholder['defaultValue'];
+            }
+            
+            if($placeholder['type'] == 'required') {
+                if(!$placeholder['value']) {
+                    return false;
+                }
+            }
+            
+            if($placeholder['regex'] && !preg_match($placeholder['regex'], $placeholder['value'])) {
+              return false;
+            }
+            
+            if($placeholder['routing'] == 'controller') {
+                $routeMatch['controller'] = $placeholder['value'];
+            } else if($placeholder['routing'] == 'action') {
+                $routeMatch['action'] = $placeholder['value'];
+            }
+            
+            unset($placeholder['type']);
+            unset($placeholder['regex']);
+            unset($placeholder['routing']);
+            unset($placeholder['match']);
+            unset($placeholder['defaultValue']);
+            
+            array_push($matchValues, $placeholder);
+        }
+        if($routeMatch['controller'] == '' || $routeMatch['action'] == '') {
+            return false;
+        }
+        $routeMatch['values'] = $matchValues;
+        return $routeMatch;
     }
 }
 
