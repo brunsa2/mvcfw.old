@@ -1,6 +1,6 @@
 <?php
 
-define('ROUTE', $_GET['url']);
+define('ROUTE', $_GET['controller_route_url']);
 
 $errorHandler = new ErrorHandler();
 

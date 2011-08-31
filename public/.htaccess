@@ -5,5 +5,5 @@
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond ${REQUEST_FILENAME} !-d
 
-  RewriteRule ^(.*)$ index.php?url=$1&%{QUERY_STRING} [PT,L]
+  RewriteRule ^(.*)$ index.php?controller_route_url=$1&%{QUERY_STRING} [PT,L]
 </IfModule>
