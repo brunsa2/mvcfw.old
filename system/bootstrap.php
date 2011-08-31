@@ -1,10 +1,12 @@
 <?php
 
+define('ROUTE', $_GET['url']);
+
 $errorHandler = new ErrorHandler();
 
 $configuration = new Configuration();
 $router = new Router($configuration->getConfiguration('routes'));
-$router->init()->findRoute();
+$route = $router->init()->findRoute(ROUTE);
 
 function __autoload($className) {
 	if(is_file(ROOT_DIRECTORY . DS . SYSTEM_DIRECTORY . DS . strtolower($className) . '.php')) {
