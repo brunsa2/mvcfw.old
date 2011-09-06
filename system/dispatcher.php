@@ -8,10 +8,21 @@ class Dispatcher {
             $controller = new ReflectionClass($route['controller'] . 'Controller');
             $controllerInstance = $controller->newInstance();
             $action = $controller->getMethod($route['action']);
-            echo '<h1>Action</h1><pre>' . print_r($action, true). '</pre>';
             $parameters = $action->getParameters();
-            echo '<h1>Parameters</h1><pre>' . print_r($parameters, true) . '</pre>';
-            $action->invoke($controllerInstance, 'id');
+            $actionArguments = array();
+            foreach($parameters as $parameter) {
+                $foundParameter = false;
+                foreach($route['values'] as $value) {
+                    if($value['name'] == $parameter->name) {
+                        array_push($actionArguments, $value['value']);
+                        $foundParameter = true;
+                    }
+                }
+                if(!$foundParameter) {
+                    array_push($actionArguments, null);
+                }
+            }
+            $action->invokeArgs($controllerInstance, $actionArguments);
         } else {
             global $errorHandler;
             $errorHandler->shutdown('Controller file was not found');
